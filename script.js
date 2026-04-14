@@ -1,4 +1,4 @@
-// --- 1. CONFIGURAÇÕES DE CONEXÃO E FIREBASE ---
+// --- 1. CONFIGURAÇÕES E INFRAESTRUTURA ---
 const TELEGRAM_TOKEN = '8560555090:AAFvyPipnavN9NW5K78X9DAwwajWmQAMogE'.trim();
 const TELEGRAM_CHAT_ID = '5512151890'.trim();
 
@@ -12,184 +12,209 @@ const firebaseConfig = {
     appId: "1:306700164707:web:29b1b5fcd21d564fe82256"
 };
 
-// Inicializa o Firebase
 if (typeof firebase !== 'undefined') {
     firebase.initializeApp(firebaseConfig);
     var database = firebase.database();
 }
 
-// Identificador da Sessão
-const sessionId = localStorage.getItem('pearl_chat_id') || 'cliente_' + Math.floor(Math.random() * 10000);
+const sessionId = localStorage.getItem('pearl_chat_id') || 'PRL-' + Math.floor(1000 + Math.random() * 9000);
 localStorage.setItem('pearl_chat_id', sessionId);
 
-// --- 2. BANCO DE DADOS E ESTADOS DO ROBÔ ---
-const pearlBotDatabase = {
-    "estoque": "O Inventory Pearl utiliza leitura de QR Code e atualização em tempo real para gerir seu estoque.",
-    "preço": "Temos planos do Basic ao Diamond. Veja a tabela de preços na página principal.",
-    "login": "Se já tem conta, acesse pelo botão 'Acessar Painel'.",
-    "ajuda": "Posso ajudar com: Criar Conta (Cadastro), Planos, ou Suporte Técnico."
+let userName = localStorage.getItem('pearl_user_name') || "";
+let statusCadastro = { ativo: false, etapa: 0, dados: {} };
+
+const faq = {
+    "estoque": "O sistema utiliza tecnologia QR Code para rastreio granular. Suporta múltiplas unidades e alertas de stock baixo.",
+    "preço": "Modelos SaaS: Basic (até 50 itens), Pro (Ilimitado) e Diamond (Customizado).",
+    "acesso": "Painel administrativo disponível via autenticação dupla no menu superior.",
+    "segurança": "Criptografia AES-256 e backups automáticos em nuvem."
 };
 
-// Variáveis para o fluxo de Cadastro de Usuário (Site)
-let modoCadastroUsuario = false;
-let etapaCadastro = 0;
-let novoUsuario = { nome: "", email: "", senha: "" };
+// Estilo padrão para os botões do chat (Garante visibilidade)
+const btnStyle = "background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.4); color: #ffffff; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 11px; text-transform: uppercase; font-weight: 600; transition: 0.3s; margin: 4px 2px; display: inline-block;";
 
-// --- 3. CONTROLE DE INTERFACE (MENU/LOGIN) ---
-const mobileMenuBtn = document.getElementById('mobile-menu');
-const navMenu = document.getElementById('nav-menu');
-
-if (mobileMenuBtn) {
-    mobileMenuBtn.addEventListener('click', () => {
-        navMenu.classList.toggle('active');
-        mobileMenuBtn.classList.toggle('open');
-    });
-}
-
-function toggleLoginMenu() {
-    const box = document.getElementById('login-menu-box');
-    if (box) box.classList.toggle('show');
-}
-
-function toggleLoginHero() {
-    const box = document.getElementById('login-hero-box');
-    if (box) {
-        box.classList.toggle('show');
-        if (box.classList.contains('show')) {
-            box.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-    }
-}
-
-function validaLogin(event) {
-    if(event) event.preventDefault(); 
-    const btn = event.target;
-    btn.innerHTML = "<i class='fa-solid fa-circle-notch fa-spin'></i> Acessando...";
-    btn.disabled = true;
-    setTimeout(() => {
-        window.location.href = "https://sistema-de-inventario-pearl.vercel.app/dashboard.html";
-    }, 1200);
-}
-
-// --- 4. LÓGICA DO CHAT (PEARL ASSIST) ---
+// --- 2. CONTROLO DE INTERFACE ---
 
 function toggleChat() {
-    const chatWindow = document.getElementById('chat-window');
-    if (chatWindow) chatWindow.classList.toggle('show');
+    const chat = document.getElementById('chat-window');
+    if (chat) chat.classList.toggle('show');
 }
 
 function escolherOpcao(tipo) {
-    const inputArea = document.getElementById('chat-input-field');
+    const inputContainer = document.getElementById('chat-input-field');
+    const menuInicial = document.querySelector('.chat-options');
+
     if (tipo === 'chat') {
-        exibirMensagemNoEcra("Quero me cadastrar", 'user');
-        if (inputArea) inputArea.style.display = 'flex';
-        iniciarFluxoCadastro();
+        exibirMensagem("Conexão solicitada via chat.", 'user');
+        if (menuInicial) menuInicial.style.display = 'none';
+        if (inputContainer) inputContainer.style.display = 'flex';
+
+        setTimeout(() => {
+            if (!userName) {
+                exibirMensagem("Pearl Assist ativo. Identifique-se com o seu nome para gerar o protocolo.", 'bot');
+            } else {
+                fluxoPrincipal();
+            }
+        }, 500);
     } else {
-        window.open("https://wa.me/5551989769982?text=Olá! Preciso de suporte técnico.", "_blank");
+        window.open(`https://wa.me/5551989769982?text=Protocolo_${sessionId}:_Suporte_para_${userName}`, "_blank");
     }
+}
+
+// --- 3. CORE DO ATENDIMENTO ---
+
+function fluxoPrincipal() {
+    const html = `
+        <div style="border-left: 2px solid #25d366; padding-left: 10px; margin-bottom: 12px; font-size: 0.85rem;">
+            <strong>Protocolo:</strong> ${sessionId}<br>
+            <strong>Status:</strong> Online
+        </div>
+        <p style="margin-bottom: 10px;">Olá ${userName}. Selecione um módulo:</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+            <button onclick="comando('Gestão de Estoque')" style="${btnStyle}">Estoque</button>
+            <button onclick="comando('Solicitar Cadastro')" style="${btnStyle}">Novo Cadastro</button>
+            <button onclick="comando('Falar com Técnico')" style="${btnStyle} border-color: #25d366; background: rgba(37,211,102,0.2);">Suporte Direto</button>
+        </div>
+        <div style="margin-top:15px; font-size:10px; opacity:0.8; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 4px; font-family: monospace; color: #fff; line-height: 1.2;">
+            > SISTEMA ATIVO<br>
+            > Digite #sair para encerrar<br>
+            > Digite #ajuda para comandos
+        </div>
+    `;
+    exibirMensagem(html, 'bot', true);
+}
+
+function comando(t) {
+    const inp = document.getElementById('user-input');
+    if (inp) { inp.value = t; enviarMensagem(); }
 }
 
 async function enviarMensagem() {
     const input = document.getElementById('user-input');
-    const texto = input.value.trim();
-    if (!texto) return;
+    const msg = input.value.trim();
+    if (!msg) return;
 
-    exibirMensagemNoEcra(texto, 'user');
-    input.value = "";
-
-    // Salva no Firebase
-    if (typeof database !== 'undefined') {
-        database.ref(`suporte/${sessionId}`).push({ texto: texto, origem: 'cliente', timestamp: Date.now() });
+    if (msg.toLowerCase() === '#sair') { resetSessao(); return; }
+    if (msg.toLowerCase() === '#ajuda') { 
+        exibirMensagem("Comandos: #sair, #status, #faq.", 'bot'); 
+        input.value = ""; 
+        return; 
     }
 
-    const textoMinusculo = texto.toLowerCase();
+    exibirMensagem(msg, 'user');
+    input.value = "";
 
-    // REGRA 1: Suporte -> WhatsApp
-    if (textoMinusculo.includes("suporte") || textoMinusculo.includes("técnico")) {
-        setTimeout(() => {
-            exibirMensagemNoEcra("Para suporte técnico, fale com o Rúbertt no WhatsApp:", 'bot');
-            exibirMensagemNoEcra("👉 wa.me/5551989769982", 'bot');
+    if (!userName) {
+        if (msg.length < 3) {
+            exibirMensagem("Informe um nome válido.", 'bot');
+            return;
+        }
+        userName = msg;
+        localStorage.setItem('pearl_user_name', userName);
+        setTimeout(() => { 
+            exibirMensagem(`Acesso autorizado: ${userName}.`, 'bot'); 
+            fluxoPrincipal(); 
         }, 600);
         return;
     }
 
-    // REGRA 2: Fluxo de Cadastro de Usuário no Site
-    if (textoMinusculo.includes("cadastrar") || textoMinusculo.includes("criar conta") || modoCadastroUsuario) {
-        processarCadastroUsuario(texto);
+    const lowMsg = msg.toLowerCase();
+
+    if (lowMsg.includes("suporte") || lowMsg.includes("técnico")) {
+        const link = `<a href="https://wa.me/5551989769982" target="_blank" style="display:block; background:#25d366; color:#fff; text-align:center; padding:10px; border-radius:4px; text-decoration:none; margin-top:10px; font-weight:bold; font-size:11px;">ABRIR WHATSAPP</a>`;
+        setTimeout(() => exibirMensagem(`Encaminhando suporte humano: ${link}`, 'bot', true), 500);
         return;
     }
 
-    // REGRA 3: Dúvidas Comuns
-    let resposta = pearlBotDatabase["ajuda"];
-    for (let chave in pearlBotDatabase) {
-        if (textoMinusculo.includes(chave)) {
-            resposta = pearlBotDatabase[chave];
-            break;
+    if (statusCadastro.ativo || lowMsg.includes("cadastrar") || lowMsg.includes("conta")) {
+        executarCadastro(msg);
+        return;
+    }
+
+    let r = "";
+    if (lowMsg.includes("estoque")) r = faq.estoque;
+    else if (lowMsg.includes("preço") || lowMsg.includes("plano")) r = faq.preço;
+    else if (lowMsg.includes("login") || lowMsg.includes("acesso")) r = faq.acesso;
+    else if (lowMsg.includes("seguro")) r = faq.segurança;
+
+    if (r) {
+        setTimeout(() => { 
+            exibirMensagem(r, 'bot');
+            // Re-exibe opções após FAQ para não deixar o usuário perdido
+            setTimeout(() => fluxoPrincipal(), 2000);
+        }, 400);
+    } else {
+        setTimeout(() => { 
+            exibirMensagem("Comando não reconhecido. Tente os botões acima.", 'bot'); 
+        }, 500);
+    }
+
+    if (typeof database !== 'undefined') {
+        database.ref(`suporte/${sessionId}`).push({ msg, origem: 'user', nome: userName, time: Date.now() });
+    }
+}
+
+function executarCadastro(t) {
+    if (!statusCadastro.ativo) {
+        statusCadastro.ativo = true;
+        statusCadastro.etapa = 1;
+        setTimeout(() => exibirMensagem("Digite o seu e-mail corporativo:", 'bot'), 500);
+        return;
+    }
+    if (statusCadastro.etapa === 1) {
+        if (!t.includes("@")) {
+            exibirMensagem("E-mail inválido. Tente novamente:", 'bot');
+            return;
         }
-    }
-    setTimeout(() => exibirMensagemNoEcra(resposta, 'bot'), 600);
-}
-
-function iniciarFluxoCadastro() {
-    modoCadastroUsuario = true;
-    etapaCadastro = 1;
-    setTimeout(() => {
-        exibirMensagemNoEcra("Ótimo! Vamos criar sua conta. Qual o seu NOME completo?", 'bot');
-    }, 800);
-}
-
-function processarCadastroUsuario(texto) {
-    if (!modoCadastroUsuario) {
-        iniciarFluxoCadastro();
-        return;
-    }
-
-    if (etapaCadastro === 1) {
-        novoUsuario.nome = texto;
-        etapaCadastro = 2;
-        setTimeout(() => exibirMensagemNoEcra(`Prazer, ${texto.split(' ')[0]}! Agora, digite seu melhor E-MAIL:`, 'bot'), 600);
-    } 
-    else if (etapaCadastro === 2) {
-        novoUsuario.email = texto;
-        etapaCadastro = 3;
-        setTimeout(() => exibirMensagemNoEcra("Quase lá! Agora escolha uma SENHA segura:", 'bot'), 600);
-    } 
-    else if (etapaCadastro === 3) {
-        novoUsuario.senha = texto;
-        modoCadastroUsuario = false;
-        etapaCadastro = 0;
-        
-        // Simulação de criação de conta e envio ao admin
-        setTimeout(() => {
-            exibirMensagemNoEcra(`✅ Conta criada com sucesso para ${novoUsuario.email}!`, 'bot');
-            exibirMensagemNoEcra("Você já pode clicar em 'Acessar Painel' para entrar.", 'bot');
-        }, 1000);
-
-        // Notifica você no Telegram sobre o novo cadastro
-        enviarTelegram(`🆕 *NOVO CADASTRO NO SITE*\n👤 Nome: ${novoUsuario.nome}\n📧 Email: ${novoUsuario.email}`);
+        statusCadastro.dados.email = t;
+        statusCadastro.etapa = 2;
+        setTimeout(() => exibirMensagem("Defina uma senha (mín. 6 caracteres):", 'bot'), 500);
+    } else if (statusCadastro.etapa === 2) {
+        if (t.length < 6) {
+            exibirMensagem("Senha curta demais:", 'bot');
+            return;
+        }
+        statusCadastro.dados.senha = t;
+        statusCadastro.ativo = false;
+        setTimeout(() => { 
+            exibirMensagem(`Solicitação de conta (${statusCadastro.dados.email}) enviada.`, 'bot');
+            fluxoPrincipal();
+        }, 800);
+        notificarTelegram(`[CADASTRO] ${userName} - ${statusCadastro.dados.email}`);
     }
 }
 
-async function enviarTelegram(mensagem) {
+// --- 4. UTILITÁRIOS ---
+
+function exibirMensagem(texto, tipo, html = false) {
+    const c = document.getElementById('chat-messages');
+    if (!c) return;
+    const d = document.createElement('div');
+    d.className = `msg ${tipo}`;
+    // Adiciona estilo inline para garantir que o balão não esconda os botões
+    d.style.overflow = "visible"; 
+    
+    html ? d.innerHTML = texto : d.innerText = texto;
+    c.appendChild(d);
+    c.scrollTop = c.scrollHeight;
+}
+
+function resetSessao() {
+    exibirMensagem("Encerrando conexão...", 'bot');
+    localStorage.removeItem('pearl_user_name');
+    localStorage.removeItem('pearl_chat_id');
+    setTimeout(() => location.reload(), 1000);
+}
+
+async function notificarTelegram(m) {
     const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
-    try {
-        await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: mensagem, parse_mode: 'Markdown' })
-        });
-    } catch (e) { console.error("Erro Telegram:", e); }
-}
-
-// --- 5. RENDERIZAÇÃO ---
-function exibirMensagemNoEcra(texto, tipo) {
-    const container = document.getElementById('chat-messages');
-    if (!container) return;
-    const div = document.createElement('div');
-    div.className = `msg ${tipo}`; // Usa o estilo do style.css
-    div.innerText = texto;
-    container.appendChild(div);
-    container.scrollTop = container.scrollHeight;
+    try { 
+        await fetch(url, { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: m }) 
+        }); 
+    } catch (e) { console.error("Telegram Error"); }
 }
 
 document.getElementById('user-input')?.addEventListener('keypress', (e) => { 

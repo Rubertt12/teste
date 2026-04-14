@@ -1,8 +1,7 @@
 // --- 1. CONFIGURAÇÕES DE CONEXÃO (Inventory Pearl) ---
 // Token e ID limpos de qualquer espaço invisível para evitar erro 401
-const TELEGRAM_TOKEN = '8560555090:AAFvyPipnavN9NW5K78X9DAwwajWmQAMogE';
-const TELEGRAM_CHAT_ID = '5512151890';
-
+const TELEGRAM_TOKEN = '8560555090:AAFvyPipnavN9NW5K78X9DAwwajWmQAMogE'.trim();
+const TELEGRAM_CHAT_ID = '5512151890'.trim();
 const firebaseConfig = {
     apiKey: "AIzaSyB9qwhZ52B_BuZHYhdzUwytLWoHXqUH9T4",
     authDomain: "inventory-pearl.firebaseapp.com",

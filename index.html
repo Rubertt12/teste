@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Pearl | Gestão de Ativos</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <header id="header">
+        <nav class="container">
+            <div class="logo">INVENTORY<span>PEARL</span></div>
+            
+            <button class="menu-toggle" id="mobile-menu" aria-label="Abrir menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <ul class="nav-links" id="nav-menu">
+                <li><a href="#inicio">Home</a></li>
+                <li><a href="#sobre">Sobre</a></li>
+                <li><a href="#recursos">Recursos</a></li>
+                <li class="nav-auth-container">
+                    <button class="btn-login-nav" onclick="toggleLoginMenu()">Login</button>
+                    <div id="login-menu-box" class="login-drop-content">
+                        <input type="email" placeholder="email@exemplo.com">
+                        <input type="password" placeholder="••••••••">
+                        <button class="btn-submit-pink" onclick="validaLogin()">Entrar</button>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="inicio" class="hero">
+            <div class="container hero-grid">
+                <div class="hero-text">
+                    <span class="badge">SISTEMA RRN MANAGER</span>
+                    <h1>Sua infraestrutura <span>lapidada e sob controle.</span></h1>
+                    <p>A solução completa para o inventário de ativos da Inventory Pearl. Monitore máquinas e periféricos com a interface que você já conhece.</p>
+                    
+                    <div class="hero-action-wrapper">
+                        <div class="hero-main-btns">
+                            <a href="#recursos" class="btn-ver-recursos">Ver Recursos</a>
+                            <button class="btn-acessar-painel" onclick="toggleLoginHero()">Acessar Painel</button>
+                        </div>
+
+                        <div id="login-hero-box" class="login-hero-content">
+                            <div class="login-icon-header">
+                                <img src="https://cdn-icons-png.flaticon.com/512/2897/2897785.png" alt="Pearl Icon">
+                            </div>
+                            <input type="email" placeholder="email@exemplo.com">
+                            <input type="password" placeholder="••••••••">
+                            <button class="btn-submit-pink" onclick="validaLogin()">Entrar no Sistema</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="hero-visual">
+                    <div class="login-card-visual-final">
+                        <div class="mock-header-icon">
+                            <img src="https://cdn-icons-png.flaticon.com/512/2897/2897785.png" alt="Pearl Icon">
+                        </div>
+                        <div class="mock-tag-gold">Login</div>
+                        <div class="mock-input-field">email@exemplo.com</div>
+                        <div class="mock-input-field">••••••••</div>
+                        <div class="mock-btn-pink">Entrar</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="sobre" class="stats-bar">
+            <div class="container stats-grid">
+                <div class="stat-item">
+                    <span class="stat-num">100%</span>
+                    <span class="stat-desc">Cloud Native</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-num">+500</span>
+                    <span class="stat-desc">Ativos Gerenciados</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-num">RRN</span>
+                    <span class="stat-desc">Eficiência Técnica</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="recursos" class="features container">
+            <div class="section-title">
+                <h2>Gestão Profissional</h2>
+                <p>Soluções inteligentes para alta performance e rastreabilidade total.</p>
+            </div>
+            <div class="grid-cards">
+                <article class="card">
+                    <div class="card-icon">🏷️</div>
+                    <h3>Controle de Setores</h3>
+                    <p>Organize seus ativos por TI, Operacional ou Administrativo com um clique.</p>
+                </article>
+                <article class="card">
+                    <div class="card-icon">🔄</div>
+                    <h3>Transferências</h3>
+                    <p>Histórico completo de movimentação de máquinas entre colaboradores.</p>
+                </article>
+                <article class="card">
+                    <div class="card-icon">📊</div>
+                    <h3>Status Real</h3>
+                    <p>Saiba instantaneamente o que está operando, em manutenção ou disponível.</p>
+                </article>
+            </div>
+        </section>
+    </main>
+
+  
+
+    <div class="chat-wrapper">
+        <button class="chat-trigger" onclick="toggleChat()" aria-label="Abrir Chat de Suporte">
+            <i class="fa-solid fa-comments"></i>
+        </button>
+        <div id="chat-window" class="chat-window">
+            <div class="chat-header">
+                <div class="chat-info">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2897/2897785.png" alt="Pearl">
+                    <div>
+                        <strong>Pearl Assist</strong>
+                        <span>Online</span>
+                    </div>
+                </div>
+                <button onclick="toggleChat()" class="chat-close" aria-label="Fechar Chat">×</button>
+            </div>
+            <div class="chat-messages" id="chat-messages">
+                <div class="msg bot">
+                    Olá! Como você gostaria de receber suporte hoje?
+                    <div class="chat-options">
+                        <button onclick="escolherOpcao('chat')" class="opt-btn">
+                            <i class="fa-solid fa-comments"></i> Seguir pelo Chat
+                        </button>
+                        <button onclick="escolherOpcao('whats')" class="opt-btn btn-wpp-opt">
+                            <i class="fa-brands fa-whatsapp"></i> Seguir via WhatsApp
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input-area" id="chat-input-field" style="display: none;">
+                <input type="text" id="user-input" placeholder="Digite sua dúvida...">
+                <button onclick="enviarMensagem()" aria-label="Enviar mensagem"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+   <section id="precos" class="pricing container">
+            <div class="section-title">
+                <span class="badge">Nossos Planos</span>
+                <h2>Escolha a sua <span>Lapidação</span></h2>
+                <p>Escalabilidade total para desde técnicos autônomos até grandes departamentos de TI.</p>
+            </div>
+
+            <div class="pricing-grid">
+                <div class="price-card" data-aos="fade-up">
+                    <h3>Essential</h3>
+                    <div class="price">R$ 149<span>/mês</span></div>
+                    <ul class="price-features">
+                        <li><i class="fa-solid fa-check"></i> Até 100 ativos</li>
+                        <li><i class="fa-solid fa-check"></i> 2 usuários administrativos</li>
+                        <li><i class="fa-solid fa-check"></i> Relatórios em PDF</li>
+                        <li class="disabled"><i class="fa-solid fa-xmark"></i> Suporte Prioritário</li>
+                    </ul>
+                    <button class="btn-price" onclick="escolherOpcao('whats')">Começar Agora</button>
+                </div>
+
+                <div class="price-card featured" data-aos="fade-up" data-aos-delay="100">
+                    <div class="popular-tag">MAIS ESCOLHIDO</div>
+                    <h3>Diamond</h3>
+                    <div class="price">R$ 299<span>/mês</span></div>
+                    <ul class="price-features">
+                        <li><i class="fa-solid fa-check"></i> Ativos Ilimitados</li>
+                        <li><i class="fa-solid fa-check"></i> Usuários Ilimitados</li>
+                        <li><i class="fa-solid fa-check"></i> Auditoria de Logs</li>
+                        <li><i class="fa-solid fa-check"></i> Suporte VIP 24/7</li>
+                    </ul>
+                    <button class="btn-price-featured" onclick="escolherOpcao('whats')">Assinar Diamond</button>
+                </div>
+
+                <div class="price-card" data-aos="fade-up" data-aos-delay="200">
+                    <h3>Enterprise</h3>
+                    <div class="price">Custom<span>/mês</span></div>
+                    <ul class="price-features">
+                        <li><i class="fa-solid fa-check"></i> Instalação Local (On-premise)</li>
+                        <li><i class="fa-solid fa-check"></i> Integração via API</li>
+                        <li><i class="fa-solid fa-check"></i> Treinamento de Equipe</li>
+                        <li><i class="fa-solid fa-check"></i> Gerente de Conta Dedicado</li>
+                    </ul>
+                    <button class="btn-price" onclick="escolherOpcao('whats')">Falar com Consultor</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer-pro">
+        <div class="container footer-grid">
+            <div class="footer-brand">
+                <div class="logo">INVENTORY<span>PEARL</span></div>
+                <p>Sua infraestrutura sob controle com a precisão RRN Manager.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#"><i class="fa-brands fa-youtube"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-links">
+                <h4>Navegação</h4>
+                <ul>
+                    <li><a href="#inicio">Home</a></li>
+                    <li><a href="#sobre">Sobre</a></li>
+                    <li><a href="#recursos">Recursos</a></li>
+                    <li><a href="#precos">Planos</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-contact">
+                <h4>Contato & Dados</h4>
+                <p><i class="fa-solid fa-location-dot"></i> São Leopoldo, RS - Região Metropolitana</p>
+                <p><i class="fa-solid fa-envelope"></i> contato@rrnmanager.com.br</p>
+                <p><strong>Rúbertt Informática LTDA</strong></p>
+                <p>CNPJ: 00.000.000/0001-00</p>
+            </div>
+
+     <div class="footer-pay">
+    <h4>Formas de Pagamento</h4>
+    <div class="pay-icons">
+        <i class="fa-solid fa-barcode" title="Boleto Bancário"></i>
+        
+        <svg class="pix-icon" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11.95 0L8.19 3.76 11.95 7.52l3.76-3.76L11.95 0zM7.52 4.43L0 11.95l7.52 7.52 3.76-3.76-3.76-3.76 3.76-3.76-3.76-3.76zm8.86 0l-3.76 3.76 3.76 3.76-3.76 3.76 3.76 3.76L24 11.95l-7.52-7.52zM11.95 16.38l-3.76 3.76 3.76 3.76 3.76-3.76-3.76-3.76z"/>
+        </svg>
+    </div>
+    <p class="secure-text"><i class="fa-solid fa-shield-halved"></i> Pagamento Seguro via RRN Manager</p>
+</div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Inventory Pearl | Todos os direitos reservados por Rúbertt Ramires da Silva.</p>
+        </div>
+    </footer>
+
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

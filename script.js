@@ -1,5 +1,5 @@
 // --- 1. CONFIGURAÇÕES DE CONEXÃO (Inventory Pearl) ---
-// Token e ID limpos de qualquer espaço invisível
+// Token e ID limpos de qualquer espaço invisível para evitar erro 401
 const TELEGRAM_TOKEN = '8560555090:AAFvyPipnavN9NW5K78X9DAwwajWmQAMogE';
 const TELEGRAM_CHAT_ID = '5512151890';
 
@@ -21,6 +21,7 @@ if (typeof firebase !== 'undefined') {
     console.warn("Firebase não detetado. Verifique os links no index.html");
 }
 
+// Identificador da Sessão do Cliente (Persistente no navegador)
 const sessionId = localStorage.getItem('pearl_chat_id') || 'cliente_' + Math.floor(Math.random() * 10000);
 localStorage.setItem('pearl_chat_id', sessionId);
 
@@ -35,7 +36,7 @@ if (mobileMenuBtn) {
     });
 }
 
-// --- 3. CONTROLES DE LOGIN ---
+// --- 3. CONTROLES DE LOGIN E NAVEGAÇÃO ---
 function toggleLoginMenu() {
     const box = document.getElementById('login-menu-box');
     if (box) box.classList.toggle('show');
@@ -62,7 +63,7 @@ function validaLogin() {
     }, 1200);
 }
 
-// --- 4. LÓGICA DO CHAT DE SUPORTE (CORRIGIDA) ---
+// --- 4. LÓGICA DO CHAT DE SUPORTE PEARL ASSIST ---
 
 function toggleChat() {
     const chatWindow = document.getElementById('chat-window');
@@ -90,7 +91,7 @@ async function enviarMensagem() {
     exibirMensagemNoEcra(texto, 'user');
     input.value = "";
 
-    // 1. Grava no Firebase
+    // 1. Grava no Firebase para o teu histórico de técnico
     if (typeof database !== 'undefined') {
         database.ref(`suporte/${sessionId}`).push({
             texto: texto,
@@ -99,7 +100,7 @@ async function enviarMensagem() {
         });
     }
 
-    // 2. Envia para o Telegram (URL Formatada para evitar 401)
+    // 2. Envia para o teu Telegram (URL corrigida para evitar erro 401)
     const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
     
     try {
@@ -117,6 +118,7 @@ async function enviarMensagem() {
     }
 }
 
+// Função para renderizar as mensagens no ecrã com o estilo Glassmorphism
 function exibirMensagemNoEcra(texto, tipo) {
     const container = document.getElementById('chat-messages');
     if (!container) return;
@@ -127,13 +129,18 @@ function exibirMensagemNoEcra(texto, tipo) {
     container.scrollTop = container.scrollHeight;
 }
 
+// Escuta em tempo real quando o técnico (você) responde via Firebase
 if (typeof database !== 'undefined') {
     database.ref(`suporte/${sessionId}`).on('child_added', (snapshot) => {
         const msg = snapshot.val();
-        if (msg.origem === 'admin') exibirMensagemNoEcra(msg.texto, 'bot');
+        // Apenas mensagens marcadas como 'admin' aparecem como balão do bot
+        if (msg.origem === 'admin') {
+            exibirMensagemNoEcra(msg.texto, 'bot');
+        }
     });
 }
 
+// Atalho para enviar mensagem ao pressionar Enter
 document.getElementById('user-input')?.addEventListener('keypress', (e) => { 
     if (e.key === 'Enter') enviarMensagem(); 
 });

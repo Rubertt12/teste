@@ -561,3 +561,24 @@ input {
     border-radius: 12px 12px 4px 12px;
     font-weight: 600;
 }
+
+
+
+/* Atualize a classe .logo existente */
+.logo { 
+    font-weight: 800; 
+    font-size: 1.5rem; 
+    letter-spacing: -0.5px; 
+    display: flex; /* Adicionado para alinhar o TM perfeitamente */
+    align-items: flex-start; 
+}
+
+/* Adicione esta nova regra para o símbolo */
+.logo .tm {
+    font-size: 0.65rem;    /* Tamanho reduzido */
+    margin-left: 2px;      /* Pequeno afastamento do nome */
+    font-weight: 400;      /* Peso mais leve que o logo */
+    color: var(--white);   /* Mantém a cor principal */
+    opacity: 0.7;          /* Leve transparência para elegância */
+    vertical-align: super;
+}

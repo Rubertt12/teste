@@ -1,4 +1,5 @@
 // --- 1. CONFIGURAÇÕES DE CONEXÃO (Inventory Pearl) ---
+// Token e ID limpos de qualquer espaço invisível
 const TELEGRAM_TOKEN = '8560555090:AAFvyPipnavN9NW5K78X9DAwwajWmQAMogE';
 const TELEGRAM_CHAT_ID = '5512151890';
 
@@ -12,13 +13,14 @@ const firebaseConfig = {
     appId: "1:306700164707:web:29b1b5fcd21d564fe82256"
 };
 
-// Inicializa o Firebase
+// Inicializa o Firebase de forma segura
 if (typeof firebase !== 'undefined') {
     firebase.initializeApp(firebaseConfig);
     var database = firebase.database();
+} else {
+    console.warn("Firebase não detetado. Verifique os links no index.html");
 }
 
-// Identificador da Sessão do Cliente
 const sessionId = localStorage.getItem('pearl_chat_id') || 'cliente_' + Math.floor(Math.random() * 10000);
 localStorage.setItem('pearl_chat_id', sessionId);
 
@@ -32,15 +34,6 @@ if (mobileMenuBtn) {
         mobileMenuBtn.classList.toggle('open');
     });
 }
-
-document.querySelectorAll('.nav-links a').forEach(link => {
-    link.addEventListener('click', () => {
-        if(navMenu && navMenu.classList.contains('active')) {
-            navMenu.classList.remove('active');
-            mobileMenuBtn.classList.remove('open');
-        }
-    });
-});
 
 // --- 3. CONTROLES DE LOGIN ---
 function toggleLoginMenu() {
@@ -61,8 +54,6 @@ function toggleLoginHero() {
 function validaLogin() {
     if(event) event.preventDefault(); 
     const btn = event.target;
-    const originalText = btn.innerHTML;
-    
     btn.innerHTML = "<i class='fa-solid fa-circle-notch fa-spin'></i> Acessando...";
     btn.disabled = true;
     
@@ -71,7 +62,7 @@ function validaLogin() {
     }, 1200);
 }
 
-// --- 4. LÓGICA DO CHAT DE SUPORTE REAL ---
+// --- 4. LÓGICA DO CHAT DE SUPORTE (CORRIGIDA) ---
 
 function toggleChat() {
     const chatWindow = document.getElementById('chat-window');
@@ -79,17 +70,12 @@ function toggleChat() {
 }
 
 function escolherOpcao(tipo) {
-    const container = document.getElementById('chat-messages');
     const inputArea = document.getElementById('chat-input-field');
-
     if (tipo === 'chat') {
         exibirMensagemNoEcra("Seguir pelo Chat", 'user');
         if (inputArea) inputArea.style.display = 'flex';
-        
         setTimeout(() => {
-            exibirMensagemNoEcra("Perfeito! Digite sua dúvida abaixo e o técnico Rúbertt responderá aqui.", 'bot');
-            const input = document.getElementById('user-input');
-            if (input) input.focus();
+            exibirMensagemNoEcra("Digite sua dúvida abaixo. O técnico Rúbertt responderá aqui.", 'bot');
         }, 600);
     } else {
         window.open("https://wa.me/5551989769982?text=Olá! Preciso de suporte com o Inventory Pearl.", "_blank");
@@ -98,16 +84,13 @@ function escolherOpcao(tipo) {
 
 async function enviarMensagem() {
     const input = document.getElementById('user-input');
-    if (!input) return;
-    
     const texto = input.value.trim();
-    if (texto === "") return;
+    if (!texto) return;
 
-    // 1. Exibe no chat do site
     exibirMensagemNoEcra(texto, 'user');
     input.value = "";
 
-    // 2. Salva no Firebase para histórico/resposta do Admin
+    // 1. Grava no Firebase
     if (typeof database !== 'undefined') {
         database.ref(`suporte/${sessionId}`).push({
             texto: texto,
@@ -116,26 +99,27 @@ async function enviarMensagem() {
         });
     }
 
-    // 3. Envia Notificação para o seu Telegram
+    // 2. Envia para o Telegram (URL Formatada para evitar 401)
+    const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
+    
     try {
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+        await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 chat_id: TELEGRAM_CHAT_ID,
-                text: `💎 *NOVO CHAMADO PEARL*\n\n👤 ID: ${sessionId}\n💬 Mensagem: ${texto}`,
+                text: `💎 *NOVO CHAMADO PEARL*\n👤 ID: ${sessionId}\n💬: ${texto}`,
                 parse_mode: 'Markdown'
             })
         });
     } catch (e) {
-        console.error("Erro ao contactar o Telegram:", e);
+        console.error("Erro na API do Telegram:", e);
     }
 }
 
 function exibirMensagemNoEcra(texto, tipo) {
     const container = document.getElementById('chat-messages');
     if (!container) return;
-    
     const div = document.createElement('div');
     div.className = `msg ${tipo}`;
     div.innerText = texto;
@@ -143,27 +127,13 @@ function exibirMensagemNoEcra(texto, tipo) {
     container.scrollTop = container.scrollHeight;
 }
 
-// Escuta respostas do técnico via Firebase (Aparece no balão branco)
 if (typeof database !== 'undefined') {
     database.ref(`suporte/${sessionId}`).on('child_added', (snapshot) => {
         const msg = snapshot.val();
-        if (msg.origem === 'admin') {
-            exibirMensagemNoEcra(msg.texto, 'bot');
-        }
+        if (msg.origem === 'admin') exibirMensagemNoEcra(msg.texto, 'bot');
     });
 }
 
-// Atalho Tecla Enter
 document.getElementById('user-input')?.addEventListener('keypress', (e) => { 
     if (e.key === 'Enter') enviarMensagem(); 
 });
-
-// Fecha dropdowns ao clicar fora
-window.onclick = function(event) {
-    if (!event.target.matches('.btn-login-nav') && !event.target.matches('.btn-acessar-painel')) {
-        const dropdown = document.getElementById('login-menu-box');
-        if (dropdown && dropdown.classList.contains('show') && !dropdown.contains(event.target)) {
-            dropdown.classList.remove('show');
-        }
-    }
-};

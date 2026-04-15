@@ -30,7 +30,6 @@ const faq = {
     "segurança": "Criptografia AES-256 e backups automáticos em nuvem."
 };
 
-// Estilo padrão para os botões do chat (Garante visibilidade)
 const btnStyle = "background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.4); color: #ffffff; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 11px; text-transform: uppercase; font-weight: 600; transition: 0.3s; margin: 4px 2px; display: inline-block;";
 
 // --- 2. CONTROLO DE INTERFACE ---
@@ -140,7 +139,6 @@ async function enviarMensagem() {
     if (r) {
         setTimeout(() => { 
             exibirMensagem(r, 'bot');
-            // Re-exibe opções após FAQ para não deixar o usuário perdido
             setTimeout(() => fluxoPrincipal(), 2000);
         }, 400);
     } else {
@@ -191,7 +189,6 @@ function exibirMensagem(texto, tipo, html = false) {
     if (!c) return;
     const d = document.createElement('div');
     d.className = `msg ${tipo}`;
-    // Adiciona estilo inline para garantir que o balão não esconda os botões
     d.style.overflow = "visible"; 
     
     html ? d.innerHTML = texto : d.innerText = texto;
@@ -219,4 +216,70 @@ async function notificarTelegram(m) {
 
 document.getElementById('user-input')?.addEventListener('keypress', (e) => { 
     if (e.key === 'Enter') enviarMensagem(); 
+});
+
+// --- 5. NAVEGAÇÃO E LOGIN (SISTEMA RRN MANAGER) ---
+
+function toggleLoginMenu() {
+    const loginBox = document.getElementById('login-menu-box');
+    if (loginBox) loginBox.classList.toggle('show');
+}
+
+function toggleLoginHero() {
+    const heroLoginBox = document.getElementById('login-hero-box');
+    if (heroLoginBox) {
+        heroLoginBox.classList.toggle('show');
+        if (heroLoginBox.classList.contains('show')) {
+            heroLoginBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+}
+
+function validaLogin() {
+    const emails = document.querySelectorAll('input[type="email"], input[name="user"]');
+    const passwords = document.querySelectorAll('input[type="password"]');
+    
+    let userDigitado = "";
+    let senhaDigitada = "";
+
+    emails.forEach(input => { if(input.value) userDigitado = input.value; });
+    passwords.forEach(input => { if(input.value) senhaDigitada = input.value; });
+
+    // LÓGICA SUPER ADMIN
+    if (userDigitado === 'superadmin' && senhaDigitada === 'suP3r@dm1n!') {
+        console.log("Super Admin detectado. Redirecionando...");
+        localStorage.setItem('pearl_admin_active', 'true');
+        // Passo 1: Entra na página de usuários
+        window.location.href = "https://sistema-de-inventario-pearl.vercel.app/usuarios.html";
+        return;
+    }
+
+    // LÓGICA USUÁRIO COMUM
+    if (userDigitado.includes("@") && senhaDigitada.length >= 6) {
+        localStorage.setItem('pearl_logged_in', 'true');
+        window.location.href = "https://sistema-de-inventario-pearl.vercel.app/dashboard.html";
+    } else {
+        alert("Credenciais inválidas. Verifique o usuário e a senha.");
+    }
+}
+
+// Controle do Menu Mobile
+const mobileMenu = document.getElementById('mobile-menu');
+const navLinks = document.querySelector('.nav-links');
+
+if (mobileMenu) {
+    mobileMenu.addEventListener('click', () => {
+        mobileMenu.classList.toggle('open');
+        navLinks.classList.toggle('active');
+    });
+}
+
+// Atalho Enter para Login
+document.querySelectorAll('input').forEach(input => {
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const isLoginInput = input.closest('#login-hero-box') || input.closest('#login-menu-box');
+            if (isLoginInput) validaLogin();
+        }
+    });
 });

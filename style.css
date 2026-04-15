@@ -536,49 +536,21 @@ input {
 
 
 
-/* Garante que o container de mensagens role corretamente e tenha as cores do projeto */
-.chat-messages {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 20px;
-    background: rgba(0, 0, 0, 0.03); /* Leve contraste com o bege do fundo */
-    overflow-y: auto;
+.about-detail { padding: 80px 0; }
+.about-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+    gap: 40px; 
+    margin-top: 30px; 
 }
-
-.msg.bot {
-    background: #ffffff;
-    color: var(--text-dark);
-    align-self: flex-start;
-    border-radius: 12px 12px 12px 4px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+.about-roles-box { 
+    background: rgba(255, 255, 255, 0.03); 
+    padding: 30px; 
+    border-radius: 20px; 
+    border: 1px solid var(--gold); 
 }
-
-.msg.user {
-    background: var(--pink);
-    color: var(--text-dark);
-    align-self: flex-end;
-    border-radius: 12px 12px 4px 12px;
-    font-weight: 600;
-}
-
-
-
-/* Atualize a classe .logo existente */
-.logo { 
-    font-weight: 800; 
-    font-size: 1.5rem; 
-    letter-spacing: -0.5px; 
-    display: flex; /* Adicionado para alinhar o TM perfeitamente */
-    align-items: flex-start; 
-}
-
-/* Adicione esta nova regra para o símbolo */
-.logo .tm {
-    font-size: 0.65rem;    /* Tamanho reduzido */
-    margin-left: 2px;      /* Pequeno afastamento do nome */
-    font-weight: 400;      /* Peso mais leve que o logo */
-    color: var(--white);   /* Mantém a cor principal */
-    opacity: 0.7;          /* Leve transparência para elegância */
-    vertical-align: super;
-}
+.roles-list { list-style: none; }
+.roles-list li { display: flex; gap: 15px; margin-bottom: 20px; }
+.roles-list i { color: var(--pink); font-size: 1.4rem; margin-top: 5px; }
+.roles-list strong { color: var(--gold); display: block; }
+.roles-list p { font-size: 0.9rem; opacity: 0.8; }

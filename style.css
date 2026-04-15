@@ -162,7 +162,30 @@ nav { display: flex; justify-content: space-between; align-items: center; width:
 .login-icon-header img { width: 60px; margin-bottom: 10px; }
 
 /* --- CARD VISUAL FLUTUANTE (REPRODUÇÃO EXATA DA IMAGEM) --- */
-.hero-visual { display: flex; justify-content: flex-end; width: 100%; }
+.hero-visual {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
+    width: 100%;
+}
+
+/* NOVO: Estilo para a imagem do sistema ao lado do login */
+.system-mockup-card {
+    background-color: var(--gold); /* Moldura dourada conforme a imagem */
+    padding: 12px;
+    border-radius: 30px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    flex: 1;
+    max-width: 580px; /* Garante que o painel seja maior que o login */
+}
+
+.system-mockup-card img {
+    width: 100%;
+    height: auto;
+    border-radius: 20px;
+    display: block;
+}
 
 .login-card-visual-final {
     background-color: var(--beige-card);
@@ -214,6 +237,17 @@ nav { display: flex; justify-content: space-between; align-items: center; width:
     text-align: center; 
     width: 100%; 
     font-size: 1rem;
+}
+
+/* Ajuste de responsividade para não quebrar o layout lateral */
+@media (max-width: 1100px) {
+    .hero-visual {
+        flex-direction: column;
+        gap: 40px;
+    }
+    .system-mockup-card {
+        max-width: 100%;
+    }
 }
 
 /* --- CLASSES UTILITÁRIAS DE EXIBIÇÃO --- */
